@@ -36,6 +36,42 @@ export type Database = {
         }
         Relationships: []
       }
+      investments: {
+        Row: {
+          created_at: string
+          current_price: number
+          id: string
+          purchase_date: string
+          purchase_price: number
+          shares: number
+          symbol: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_price: number
+          id?: string
+          purchase_date?: string
+          purchase_price: number
+          shares: number
+          symbol: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_price?: number
+          id?: string
+          purchase_date?: string
+          purchase_price?: number
+          shares?: number
+          symbol?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

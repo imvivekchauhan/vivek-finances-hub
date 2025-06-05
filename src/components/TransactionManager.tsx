@@ -4,11 +4,11 @@ import { Plus, Edit, Trash2, Calendar, DollarSign } from 'lucide-react';
 import { useFinanceData } from '../hooks/useFinanceData';
 
 const TransactionManager = () => {
-  const { transactions, addTransaction, updateTransaction, deleteTransaction } = useFinanceData();
+  const { transactions, addTransaction, updateTransaction, deleteTransaction, loading } = useFinanceData();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    type: 'expense',
+    type: 'expense' as 'expense' | 'income',
     amount: '',
     category: '',
     description: '',
@@ -20,19 +20,18 @@ const TransactionManager = () => {
     income: ['Salary', 'Freelance', 'Investment', 'Business', 'Other']
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const transaction = {
+    const transactionData = {
       ...formData,
       amount: parseFloat(formData.amount),
-      id: editingId || Date.now()
     };
 
     if (editingId) {
-      updateTransaction(transaction);
+      await updateTransaction({ ...transactionData, id: editingId, user_id: '' });
       setEditingId(null);
     } else {
-      addTransaction(transaction);
+      await addTransaction(transactionData);
     }
 
     setFormData({
@@ -45,15 +44,29 @@ const TransactionManager = () => {
     setIsFormOpen(false);
   };
 
-  const handleEdit = (transaction) => {
-    setFormData(transaction);
+  const handleEdit = (transaction: any) => {
+    setFormData({
+      type: transaction.type,
+      amount: transaction.amount.toString(),
+      category: transaction.category,
+      description: transaction.description,
+      date: transaction.date
+    });
     setEditingId(transaction.id);
     setIsFormOpen(true);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -80,7 +93,7 @@ const TransactionManager = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value, category: '' })}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value as 'expense' | 'income', category: '' })}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 required
               >

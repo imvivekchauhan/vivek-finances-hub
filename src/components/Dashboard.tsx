@@ -1,12 +1,14 @@
 
 import React from 'react';
-import { BarChart3, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { BarChart3, TrendingUp, TrendingDown, Wallet, LogOut, User } from 'lucide-react';
 import { useFinanceData } from '../hooks/useFinanceData';
+import { useAuth } from '../hooks/useAuth';
 import ExpenseChart from './ExpenseChart';
 import InvestmentChart from './InvestmentChart';
 
 const Dashboard = () => {
-  const { transactions, investments, summary } = useFinanceData();
+  const { transactions, investments, summary, loading } = useFinanceData();
+  const { user, signOut } = useAuth();
 
   const StatCard = ({ title, amount, icon: Icon, gradient, isPositive = true }) => (
     <div className="gradient-card rounded-2xl p-6 shadow-xl border border-white/20 animate-fade-in hover:scale-105 transition-transform duration-300">
@@ -25,18 +27,38 @@ const Dashboard = () => {
     </div>
   );
 
+  if (loading) {
+    return (
+      <div className="min-h-screen gradient-primary flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Profile Section */}
       <div className="gradient-card rounded-2xl p-8 shadow-xl border border-white/20 animate-slide-up">
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-            VC
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+              <User className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800">
+                {user?.user_metadata?.full_name || 'Vivek Chauhan'}
+              </h1>
+              <p className="text-gray-600">Personal Finance Dashboard</p>
+              <p className="text-sm text-gray-500">{user?.email}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Vivek Chauhan</h1>
-            <p className="text-gray-600">Personal Finance Dashboard</p>
-          </div>
+          <button
+            onClick={signOut}
+            className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </div>
 

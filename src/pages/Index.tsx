@@ -1,11 +1,14 @@
 
 import React, { useState } from 'react';
 import { BarChart3, DollarSign, TrendingUp, Menu, X } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 import Dashboard from '../components/Dashboard';
 import TransactionManager from '../components/TransactionManager';
 import InvestmentTracker from '../components/InvestmentTracker';
+import Auth from '../components/Auth';
 
 const Index = () => {
+  const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -27,6 +30,18 @@ const Index = () => {
         return <Dashboard />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen gradient-primary flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Auth />;
+  }
 
   return (
     <div className="min-h-screen gradient-primary">
