@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import { useFinanceData } from '../hooks/useFinanceData';

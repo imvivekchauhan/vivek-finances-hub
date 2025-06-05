@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from './useAuth';
 
 interface Transaction {
   id: string;
@@ -28,9 +29,15 @@ export const useFinanceData = () => {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Load data from Supabase
   const loadData = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       // Load transactions
       const { data: transactionsData, error: transactionsError } = await supabase
@@ -64,14 +71,28 @@ export const useFinanceData = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [user]);
 
   // Transaction methods
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'user_id'>) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to add transactions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      const transactionWithUserId = {
+        ...transaction,
+        user_id: user.id
+      };
+
       const { data, error } = await supabase
         .from('transactions')
-        .insert([transaction])
+        .insert([transactionWithUserId])
         .select()
         .single();
 
@@ -93,6 +114,15 @@ export const useFinanceData = () => {
   };
 
   const updateTransaction = async (updatedTransaction: Transaction) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update transactions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('transactions')
@@ -119,6 +149,15 @@ export const useFinanceData = () => {
   };
 
   const deleteTransaction = async (id: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete transactions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('transactions')
@@ -144,10 +183,24 @@ export const useFinanceData = () => {
 
   // Investment methods
   const addInvestment = async (investment: Omit<Investment, 'id' | 'user_id'>) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to add investments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      const investmentWithUserId = {
+        ...investment,
+        user_id: user.id
+      };
+
       const { data, error } = await supabase
         .from('investments')
-        .insert([investment])
+        .insert([investmentWithUserId])
         .select()
         .single();
 
@@ -169,6 +222,15 @@ export const useFinanceData = () => {
   };
 
   const updateInvestment = async (updatedInvestment: Investment) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update investments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('investments')
@@ -195,6 +257,15 @@ export const useFinanceData = () => {
   };
 
   const deleteInvestment = async (id: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete investments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('investments')
